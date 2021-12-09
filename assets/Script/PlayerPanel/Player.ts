@@ -48,10 +48,12 @@ export class Player extends Component {
 
   blocks: Array<Node> = [];
 
+  onLoad() {
+    this.init();
+  }
 
   start() {
     // [3]
-    this.init();
   }
 
   // update (deltaTime: number) {
@@ -74,6 +76,12 @@ export class Player extends Component {
       boardNode.setPosition(boardNodePosition);
       this.blocks.push(boardNode);
     }
+  }
+
+  setControl(canControl: boolean) {
+    this.blocks.forEach((block: any) => {
+      block.getComponent("BlockPanel").setControl(canControl);
+    });
   }
 }
 

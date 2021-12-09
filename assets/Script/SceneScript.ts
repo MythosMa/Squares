@@ -53,9 +53,28 @@ export class SceneScript extends Component {
   // @property
   // serializableDummy = 0;
 
+  isMove: boolean = false;
+  isPlayerAOver: boolean = false;
+  isPlayerBOver: boolean = false;
+  isPlayerATurn: boolean = false;
+
+  @property(Node)
+  playerAPanel = null;
+
+  @property(Node)
+  playerBPanel = null;
+
+  onLoad() {
+    this.init();
+  }
+
   start() {
     // [3]
-    this.init();
+
+    this.node.on(Node.EventType.TOUCH_START, this.touchDown, this);
+    this.node.on(Node.EventType.MOUSE_DOWN, this.touchDown, this);
+
+    this.changePlayerTurn();
   }
 
   // update (deltaTime: number) {
@@ -98,17 +117,64 @@ export class SceneScript extends Component {
     let origin1 = 5;
 
     block1.blocksInfo.forEach((item) => {
-      let node = this.boardInfo[origin1 + item.relativeColumn][origin1 + item.relativeRow];
-      node.boardNode.getChildByName("Block").getComponent(Sprite).color = block1.color;
-    })
+      let node =
+        this.boardInfo[origin1 + item.relativeColumn][
+          origin1 + item.relativeRow
+        ];
+      node.boardNode.getChildByName("Block").getComponent(Sprite).color =
+        block1.color;
+    });
 
     let block2 = new BlockBase(12, new Color(0, 0, 255)).getBlocksInfo();
     let origin2 = 8;
 
     block2.blocksInfo.forEach((item) => {
-      let node = this.boardInfo[origin2 + item.relativeColumn][origin2 + item.relativeRow];
-      node.boardNode.getChildByName("Block").getComponent(Sprite).color = block2.color;
-    })
+      let node =
+        this.boardInfo[origin2 + item.relativeColumn][
+          origin2 + item.relativeRow
+        ];
+      node.boardNode.getChildByName("Block").getComponent(Sprite).color =
+        block2.color;
+    });
+  }
+
+  touchDown() {
+    console.log("touchDown==================");
+    this.node.on(Node.EventType.TOUCH_END, this.touchEnd, this);
+    this.node.on(Node.EventType.MOUSE_UP, this.touchEnd, this);
+    this.node.on(Node.EventType.MOUSE_LEAVE, this.touchEnd, this);
+
+    this.node.on(Node.EventType.TOUCH_MOVE, this.touchMove, this);
+    this.node.on(Node.EventType.MOUSE_MOVE, this.touchMove, this);
+  }
+
+  touchMove(e) {
+    console.log("touchMove==================");
+    const position = e.getLocationInView();
+    if (!this.isMove) {
+      this.isMove = true;
+    }
+  }
+
+  touchEnd() {
+    console.log("touchEnd==================");
+    if (this.isMove) {
+      this.isMove = false;
+    } else {
+    }
+
+    this.node.off(Node.EventType.TOUCH_END, this.touchEnd, this);
+    this.node.off(Node.EventType.MOUSE_UP, this.touchEnd, this);
+    this.node.off(Node.EventType.MOUSE_LEAVE, this.touchEnd, this);
+
+    this.node.off(Node.EventType.TOUCH_MOVE, this.touchMove, this);
+    this.node.off(Node.EventType.MOUSE_MOVE, this.touchMove, this);
+  }
+
+  changePlayerTurn() {
+    this.isPlayerATurn = !this.isPlayerATurn;
+    this.playerAPanel.getComponent("Player").setControl(this.isPlayerATurn);
+    this.playerBPanel.getComponent("Player").setControl(!this.isPlayerATurn);
   }
 }
 

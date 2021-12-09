@@ -42,7 +42,7 @@ export class BlockPanel extends Component {
   count = 5;
 
   isMove: boolean = false;
-  originLocation: Vec3 = null;
+  canControl: boolean = false;
 
   start() {
     // [3]
@@ -75,6 +75,10 @@ export class BlockPanel extends Component {
     this.renderBlock();
   }
 
+  setControl(canControl: boolean) {
+    this.canControl = canControl;
+  }
+
   renderBlock() {
     for (let i = 0; i < this.blockPanelBoards.length; i++) {
       for (let j = 0; j < this.blockPanelBoards[i].length; j++) {
@@ -96,31 +100,24 @@ export class BlockPanel extends Component {
   }
 
   touchDown() {
-    this.node.on(Node.EventType.TOUCH_END, this.touchEnd, this);
-    this.node.on(Node.EventType.MOUSE_UP, this.touchEnd, this);
-    this.node.on(Node.EventType.MOUSE_LEAVE, this.touchEnd, this);
+    if (this.canControl) {
+      this.node.on(Node.EventType.TOUCH_END, this.touchEnd, this);
+      this.node.on(Node.EventType.MOUSE_UP, this.touchEnd, this);
+      this.node.on(Node.EventType.MOUSE_LEAVE, this.touchEnd, this);
 
-    this.node.on(Node.EventType.TOUCH_MOVE, this.touchMove, this);
-    this.node.on(Node.EventType.MOUSE_MOVE, this.touchMove, this);
-
-    this.originLocation = this.node.getPosition();
+      this.node.on(Node.EventType.TOUCH_MOVE, this.touchMove, this);
+      this.node.on(Node.EventType.MOUSE_MOVE, this.touchMove, this);
+    }
   }
 
   touchMove(e) {
-    console.log("touchMove===================");
-    console.log(e.getLocationInView());
-    console.log("touchMove===================");
-    if(!this.isMove){
-        this.isMove = true;
-        this.node.setScale(new Vec3(2, 2, 2));
+    if (!this.isMove) {
+      this.isMove = true;
     }
   }
 
   touchEnd() {
-    console.log("touchEnd===================");
-    if (this.isMove) {
-        this.node.setScale(new Vec3(1, 1, 1));
-    } else {
+    if (!this.isMove) {
       this.blocks.rotateBlock();
       this.renderBlock();
     }
